@@ -745,41 +745,36 @@ function install20(resourcesDir) {
     const asarPath = path.join(resourcesDir, "app.asar");
     const bakPath = path.join(resourcesDir, "app.asar.bak");
 
-    if (!fs.existsSync(asarPath)) {
+    if (!fs.existsSync(asarPath) && !fs.existsSync(bakPath)) {
         console.error(`[错误] 未在资源目录中找到 app.asar: ${resourcesDir}`);
         return false;
     }
 
-    // 1. 备份
-    if (!fs.existsSync(bakPath)) {
-        console.log(`[备份] 正在创建官方原始包备份: app.asar.bak ...`);
-        fs.copyFileSync(asarPath, bakPath);
-        console.log(`[备份] 备份成功！`);
-    } else {
-        // 尝试用官方备份覆盖当前 app.asar，以确保每次汉化都基于最干净的官方英文包
-        try {
-            fs.copyFileSync(bakPath, asarPath);
-            console.log(`[还原] 已重置当前 app.asar 为官方原始备份包，以进行全新注入...`);
-        } catch (e) {
-            console.log(`[提示] 当前 app.asar 被锁定（可能是客户端正在运行），将使用当前包进行增量注入。`);
-        }
-    }
-
-    // 2. 临时提取目录
+    // 1. 临时提取目录
     const tempDir = path.join(__dirname, "_temp_asar");
     if (fs.existsSync(tempDir)) {
         fs.rmSync(tempDir, { recursive: true, force: true });
     }
 
+    // 2. 优先解包当前的 app.asar，绝不盲目用旧 bak 覆盖破坏新版本
+    let extractSource = fs.existsSync(asarPath) ? asarPath : bakPath;
+
     console.log(`[解包] 正在使用 npx 提取 app.asar...`);
-    const extractRes = runCommandSync(`npx -y @electron/asar extract "${asarPath}" "${tempDir}"`);
+    let extractRes = runCommandSync(`npx -y @electron/asar extract "${extractSource}" "${tempDir}"`);
+    
+    // 如果主包解包失败但存在备份，尝试从备份解包自愈
+    if ((!extractRes.success || !fs.existsSync(tempDir)) && fs.existsSync(bakPath) && extractSource !== bakPath) {
+        console.warn(`[自愈] 当前 app.asar 解包异常，正在尝试从原始备份 app.asar.bak 提取...`);
+        extractRes = runCommandSync(`npx -y @electron/asar extract "${bakPath}" "${tempDir}"`);
+    }
+
     if (!extractRes.success || !fs.existsSync(tempDir)) {
         console.error(`[错误] 解包失败，可能是由于系统未安装 Node.js/npm 或者网络限制。`);
         console.error(`详情: ${extractRes.stderr}\n${extractRes.stdout}`);
         return false;
     }
 
-    // 3. 注入 preload.js
+    // 3. 校验提取文件完整性
     const preloadPath = path.join(tempDir, "dist", "preload.js");
     if (!fs.existsSync(preloadPath)) {
         console.error(`[错误] 解压后未能在指定路径找到 preload.js: ${preloadPath}`);
@@ -787,11 +782,23 @@ function install20(resourcesDir) {
         return false;
     }
 
-    console.log(`[修改] 正在向 preload.js 注入汉化代码...`);
-    let content = fs.readFileSync(preloadPath, 'utf-8');
+    let rawPreloadContent = fs.readFileSync(preloadPath, 'utf-8');
+    const isCleanOfficial = !rawPreloadContent.includes(SIGNATURE_START);
+    
+    // 如果当前包为纯净官方版本且尚无备份，安全建立备份
+    if (isCleanOfficial && !fs.existsSync(bakPath) && fs.existsSync(asarPath)) {
+        try {
+            console.log(`[备份] 正在创建官方原始包备份: app.asar.bak ...`);
+            fs.copyFileSync(asarPath, bakPath);
+            console.log(`[备份] 备份成功！`);
+        } catch (e) {
+            // ignore
+        }
+    }
 
-    // 清理已有的汉化，重新注入
-    const cleanedContent = cleanJsContent(content);
+    console.log(`[修改] 正在向 preload.js 注入汉化代码...`);
+    // 深度清洗：无论此前安装过何种旧版汉化，一律清洗回纯净原版代码
+    const cleanedContent = cleanJsContent(rawPreloadContent);
     const translationJs = generateJs();
     const newContent = cleanedContent + "\n" + translationJs;
 
