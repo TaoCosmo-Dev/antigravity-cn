@@ -2,9 +2,29 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const desktopPath = path.join(process.env.USERPROFILE, 'Desktop', 'Antigravity-CN.lnk');
+const desktopPath = path.join(process.env.USERPROFILE || process.env.HOME || '', 'Desktop', 'Antigravity-CN.lnk');
 const targetScript = path.join(__dirname, 'antigravity_smart_launcher.vbs');
-const iconExe = path.join(process.env.LOCALAPPDATA, 'Programs', 'antigravity', 'Antigravity.exe');
+
+// 动态检测 Antigravity.exe 实际安装路径
+const localAppData = process.env.LOCALAPPDATA || '';
+const progFiles = process.env.ProgramFiles || 'C:\\Program Files';
+const candidates = [
+  path.join(localAppData, 'Programs', 'antigravity', 'Antigravity.exe'),
+  path.join(localAppData, 'Programs', 'Antigravity IDE', 'Antigravity.exe'),
+  path.join(progFiles, 'Antigravity', 'Antigravity.exe'),
+  'C:\\Programs\\Antigravity\\Antigravity.exe',
+  'D:\\Programs\\Antigravity\\Antigravity.exe',
+  'E:\\Programs\\Antigravity\\Antigravity.exe'
+];
+
+let iconExe = '';
+for (const p of candidates) {
+  if (fs.existsSync(p)) {
+    iconExe = p;
+    break;
+  }
+}
+if (!iconExe) iconExe = candidates[0];
 
 const vbs = [
   'Set ws = WScript.CreateObject("WScript.Shell")',
