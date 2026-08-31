@@ -1,0 +1,23 @@
+{
+  "name": "antigravity-cn",
+  "version": "2.2.1",
+  "description": "Antigravity 2.0 Chinese Localization Engine with Auto-Update Smart Guardian",
+  "main": "localization_engine.js",
+  "scripts": {
+    "start": "node localization_engine.js --brand-title english",
+    "install-cn": "node localization_engine.js --brand-title english",
+    "install-tw": "node localization_engine.js --brand-title english --tw",
+    "restore": "node localization_engine.js --huifu"
+  },
+  "dependencies": {
+    "@electron/asar": "^3.2.10"
+  },
+  "keywords": [
+    "antigravity",
+    "localization",
+    "chinese",
+    "electron"
+  ],
+  "author": "TaoCosmo-Dev",
+  "license": "MIT"
+}
