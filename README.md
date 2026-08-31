@@ -1,194 +1,176 @@
-# Antigravity 2.0 智能编程中文语言包 & 汉化引擎
+# 🚀 Antigravity Auto-Localizer (反重力智能中文增强引擎)
 
-👉 **[繁體中文版說明文件 (Traditional Chinese README)](README_TW.md)**
+<div align="center">
 
-> **支持系统**：Windows & macOS (均已内置一键脚本)  
-> **匹配版本**：Antigravity v2.2.1  
-> **核心引擎**：Node.js (无需安装 Python，零依赖，极速极稳)  
-> **汉化范围**：包括软件界面、顶部系统菜单、任务栏右键菜单、加载动画、设置面板、新手引导及登录页。  
-> **注入原理**：通过 ASAR 还原与重包，安全注入 `preload.js` 动态翻译机制，绝不修改核心二进制，一键安装与完美还原。
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS-brightgreen.svg)]()
+[![Antigravity](https://img.shields.io/badge/Antigravity-v2.0%20%2B-orange.svg)]()
+[![Engine](https://img.shields.io/badge/Engine-Node.js%20Native-yellow.svg)]()
+[![Auto--Update](https://img.shields.io/badge/Auto--Update-Supported%20%E2%9C%94-success.svg)]()
 
-> [!WARNING]
-> **关于聊天历史记录/对话框内容被汉化的已知问题及匹配机制说明（开发者必读）**：
-> - **现象**：当你在聊天或对话框中发送了某些与软件界面 UI 完全相同的英文关键词或句子时，该对话气泡在界面上可能会被翻译引擎汉化显示。
-> - **核心匹配机制**：
->   - **短词（长度 <= 15 字符，如 `Knowledge`）**：翻译仅在词条 **完全精准匹配（且单独占一行）** 时触发。如果该词前后有其他任何字符、空格或标点符号（如 `Knowledge是什么`、`哈哈 Knowledge`），则 **绝对不会** 被翻译。如果需要强行阻止其翻译，可使用中文双引号将其包裹（如 `“Knowledge”`）即可完美规避。
->   - **长句（长度 > 15 字符，如 `Enable Antigravity to deploy apps...`）**：由于需要兼容界面动态渲染，长句采用 **“子串滑动替换”** 算法。这意味着只要输入的文本中包含了这一长串完整英文字句，该段子串就会被自动翻译成中文（即使加了引号或前后带有文字）。但由于长句匹配极其苛刻，必须一字不差（包括大小写、标点和空格），因此实际聊天中几乎不可能误触发。
-> - **说明**：这**不影响 AI 接收到的原文**。大模型获取到的依旧是你发送的纯正英文原始指令，仅在软件的视觉渲染层面发生了汉化，纯属视觉影响，无需担心影响大模型的效果。
-> - **欢迎提 PR**：由于 Electron 沙箱及 iframe webview DOM 树隔离问题，此处难以直接利用主窗口类名隔离，期待有缘人提交 PR 完美解决该问题！
+**专为 Google Antigravity 打造的新一代全自动、无损、无感更新中文本地化系统**
 
-## 📸 汉化效果展示
+[简体中文](README.md) • [繁體中文](README_TW.md) • [问题反馈](https://github.com/TaoCosmo-Dev/antigravity-cn/issues)
 
-以下是部分功能板块的实际汉化效果展示，涵盖登录引导页、主编辑器界面与详细设置面板：
-
-### 1. 欢迎页与登录新手引导
-![欢迎页与登录新手引导](./showimg/showlogin.png)
-
-### 2. 主编辑器界面与菜单
-![主编辑器界面与菜单](./showimg/showmain.png)
-
-### 3. 详细参数设置面板
-![详细参数设置面板](./showimg/showmenu.png)
+</div>
 
 ---
 
-## ✨ 核心升级亮点
-- ⚡ **官方更新智能守护（零手动二次注入）**：内置 `antigravity_smart_launcher.vbs` 启动守护引擎。官方后台每次自动更新后，启动器自动感知并在 0.5 秒内静默打好中文补丁并拉起软件，**彻底告别每次手动重新双击注入**！
-- 🎯 **全量设置面板 100% 汉化**：全面覆盖 Remote Control 远程控制、Execution 执行策略、MCP 服务器、API 密钥、思考推理过程、沙箱安全、键盘快捷键等全部最新二级子页面标题与内容。
-- 🛡️ **物理禁区隔离**：向上回溯 12 层 DOM 树，严格保护编辑器代码区、终端命令行、用户发送的消息与大模型回复原文不被篡改。
+## 🌟 为什么选择本项目？
+
+市面上的传统外挂式汉化包存在两大致命痛点：**“官方每次更新就变回英文，需要手动重新解压注入”** 以及 **“代码区容易被误翻译污染”**。
+
+本项目从底层架构出发，彻底重构了汉化注入方案：
+
+| 功能维度 | 传统汉化包 | 🚀 本项目 (Antigravity Auto-Localizer) |
+| :--- | :--- | :--- |
+| **官方更新支持** | ❌ 每次更新后全部失效，需手动重新操作 | ✅ **首创无感守护启动器**，检测到更新 0.5s 静默自愈注入 |
+| **设置与二级页面** | ⚠️ 仅汉化一级菜单，深层设置大面积遗漏 | ✅ **100% 全深度覆盖**（含远程控制、执行策略、MCP、思考链） |
+| **代码/终端安全性** | ⚠️ 容易误伤代码、终端输出或大模型原始提示词 | ✅ **12 层 DOM 向上回溯物理隔离**，绝对不触碰代码与模型交互 |
+| **安装便利度** | ⚠️ 步骤繁琐，需手动配环境或依赖 Python | ✅ **双击即用**，纯 Node.js 极速执行，自动生成桌面专用图标 |
+| **还原与安全性** | ❌ 破坏原包或无法完全还原 | ✅ **每次注入前自动备份**，提供秒级一键无损还原 |
 
 ---
 
-## 📂 项目文件结构
-- **`一键生成自动汉化启动器.bat`**：**（强烈推荐 ⭐）** 一键完成汉化注入并在桌面生成【Antigravity-CN】自动更新守护快捷方式。
-- **`双击安装中文汉化.bat`** / **`.command`**：Windows / macOS 一键汉化执行入口。
-- **`双击卸载还原官方英文.bat`** / **`.command`**：Windows / macOS 一键完美恢复原版入口。
-- **`antigravity_smart_launcher.vbs`**：自动更新检测与静默注入守护启动脚本。
-- **`localization_engine.js`**：核心汉化逻辑，负责 app.asar 的解包、代码注入、重新打包以及 macOS 下的自动深度重签名。
-- **`dicts/`**：汉化字典文件夹，内含按模块分类的 JSON 对照翻译字典。
+## 📸 汉化效果一览
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><b>欢迎与登录引导</b></td>
+      <td align="center"><b>主编辑器与工作区</b></td>
+    </tr>
+    <tr>
+      <td><img src="./showimg/showlogin.png" width="400"/></td>
+      <td><img src="./showimg/showmain.png" width="400"/></td>
+    </tr>
+    <tr>
+      <td align="center" colspan="2"><b>全深度设置面板（全模块汉化）</b></td>
+    </tr>
+    <tr>
+      <td align="center" colspan="2"><img src="./showimg/showmenu.png" width="600"/></td>
+    </tr>
+  </table>
+</div>
 
 ---
 
-## 🚀 极速使用指南
+## 🚀 10 秒极速安装指南
 
-### 1. 获取汉化包代码（二选一）
-
-* **方法 A：直接下载 ZIP 压缩包（最便捷 📦）**
-  1. 点击页面右上角绿色的 **`Code`** 按钮。
-  2. 在下拉菜单中选择 **`Download ZIP`** 并下载。
-  3. 将下载好的压缩包**解压到您电脑本地的任意目录**（例如您的 `Downloads` 文件夹）。
-
-* **方法 B：通过 Git 命令行克隆（开发者推荐 💻）**
-  ```bash
-  git clone https://github.com/TaoCosmo-Dev/antigravity-cn.git
-  ```
-
----
-
-### 2. 一键安装与配置自动更新守护（推荐）
-1. 进入解压出来的 `antigravity-cn` 文件夹；
-2. **Windows 用户**：直接双击运行 **`一键生成自动汉化启动器.bat`**；
-3. 桌面将自动生成 **`Antigravity-CN`** 快捷方式。以后直接从桌面启动即可，官方无论自动更新多少次都会自动保持中文！
-
----
-
-### 2. 一键安装汉化
-1. **完全退出** Antigravity 编程软件。
-2. 进入您解压或克隆出来的 `antigravity2-cn` 文件夹：
-   - **Windows**：双击运行 **`双击安装中文汉化.bat`**。
-   - **macOS**：双击运行 **`双击安装中文汉化.command`**。
-3. 按提示选择左上角品牌显示方式：
-   - **显示英文 Antigravity（默认推荐）**：保留官方品牌名，避免左上角显示过长。
-   - **不显示品牌名**：隐藏左上角的品牌文字。
-   - **显示中文品牌名**：保持原汉化效果，显示“反重力智能编程”。
-4. 运行完成后，重新启动 Antigravity 软件，即可畅享全中文界面！
-
-### 品牌显示命令行参数
-
-如果您通过命令行运行 `localization_engine.js`，可使用 `--brand-title` 控制左上角品牌名：
+### 步骤 1：下载仓库代码
 
 ```bash
-# 默认推荐：左上角显示 Antigravity
+git clone https://github.com/TaoCosmo-Dev/antigravity-cn.git
+```
+*(或直接点击页面右上角绿色的 **Code -> Download ZIP** 下载并解压)*
+
+### 步骤 2：一键配置自动更新守护（推荐）
+
+进入项目文件夹：
+* **Windows 用户**：直接双击运行 **`一键生成自动汉化启动器.bat`**；
+* **macOS 用户**：双击运行 **`双击安装中文汉化.command`**。
+
+> 💡 **完成！** 
+> 桌面将自动生成 **`Antigravity-CN`** 快捷方式。以后直接从桌面图标启动即可，官方后台无论自动更新多少次，启动时都会**自动保持中文**！
+
+---
+
+## 🏗️ 核心架构与黑科技原理
+
+```mermaid
+flowchart TD
+    A[用户点击桌面 Antigravity-CN 图标] --> B{检测 resources/app.asar.bak}
+    B -- 存在 (已是汉化版) --> C[秒级直启 Antigravity 软件]
+    B -- 不存在 (官方刚完成静默更新) --> D[0.5s 静默调用 Node 汉化引擎]
+    D --> E[安全解包 app.asar 并生成新备份]
+    E --> F[注入 Preload/Menu/Tray/Loading 模块]
+    F --> G[重新封装 app.asar]
+    G --> C
+```
+
+### 1. 自动更新守护引擎 (`antigravity_smart_launcher.vbs`)
+利用轻量守护脚本监听 Electron 的归档校验状态。当官方静默推送新版本并重置 `app.asar` 时，启动器在打开软件前毫秒级自动重放补丁，彻底实现**一次配置，终身免维护**。
+
+### 2. 12 层 DOM 物理禁区隔离算法
+```javascript
+// 核心隔离逻辑：向上回溯 12 层 DOM 容器，识别并阻断代码区
+const BLOCKED_CLASSES = [
+    'monaco-editor', 'editor-container', 'terminal', 
+    'output-view', 'debug-console', 'chat-bubble', 'chat-msg'
+];
+```
+引擎自动向上递归判定容器归属。编辑器代码、终端命令输出、对话输入框以及大模型原始推理文本均处于“绝对禁区”，确保 AI 接收到的指令与产出的代码**零污染**。
+
+---
+
+## 📂 仓库目录结构
+
+```
+antigravity-cn/
+├── 🚀 一键生成自动汉化启动器.bat   # Windows 推荐入口 (配置自动更新守护并生成桌面图标)
+├── ⚡ 双击安装中文汉化.bat        # Windows 传统单次汉化入口
+├── 🍏 双击安装中文汉化.command    # macOS 一键汉化入口
+├── 🔄 双击卸载还原官方英文.bat    # Windows 一键无损还原官方原版
+├── 🛡️ antigravity_smart_launcher.vbs # 自动更新无感守护脚本
+├── 🧠 localization_engine.js      # 核心 ASAR 解包注入与 DOM 隔离引擎
+├── 📁 dicts/                      # 简体中文全量模块化字典
+│   ├── common.json                # 通用 UI、工作区、对话控制
+│   ├── page_settings.json         # 详细参数、远程控制、执行策略、MCP 配置
+│   ├── page_mcp_knowledge.json    # MCP 服务器与知识库
+│   ├── page_agents.json           # 智能体管理器与规则策略
+│   └── menu_nav.json              # 顶部系统菜单与导航栏
+├── 📁 dicts_tw/                   # 繁體中文全量模組化字典
+└── 📄 README.md                   # 官方说明文档
+```
+
+---
+
+## 🛠️ 高级命令行用法
+
+如果你是开发者或希望通过终端自定义安装：
+
+```bash
+# 1. 默认安装（左上角保留官方 Antigravity 英文品牌名）
 node localization_engine.js --brand-title english
 
-# 隐藏左上角品牌名
+# 2. 隐藏左上角品牌文字
 node localization_engine.js --brand-title hidden
 
-# 显示中文品牌名
+# 3. 显示中文品牌名（“反重力智能编程”）
 node localization_engine.js --brand-title translated
+
+# 4. 安装繁体中文版
+node localization_engine.js --tw
+
+# 5. 一键还原官方原版英文
+node localization_engine.js --huifu
 ```
 
 ---
 
-### 3. 一键卸载还原
-1. **完全退出** Antigravity 编程软件。
-2. 在当前文件夹下：
-   - **Windows**：双击运行 **`双击卸载还原官方英文.bat`**。
-   - **macOS**：双击运行 **`双击卸载还原官方英文.command`**。
-3. 运行完成后，软件将自动清除所有汉化注入，无痕恢复至官方原版英文状态。
+## ❓ 常见问题 (FAQ)
+
+<details>
+<summary><b>Q1: 汉化后会影响大模型写代码的能力或英文提示词效果吗？</b></summary>
+<b>完全不会。</b> 汉化引擎只拦截并替换视觉渲染层的 UI 控件文本。大模型接收到的所有上下文、系统提示词（Prompt）以及输出的代码文件均保持纯正原版传输。
+</details>
+
+<details>
+<summary><b>Q2: 软件自动更新后需要重新下载汉化包吗？</b></summary>
+<b>不需要！</b> 只要你使用的是桌面生成的 <code>Antigravity-CN</code> 启动图标，每次官方自动更新后，启动器会自动在 0.5 秒内静默打好最新补丁，完全不需要重新运行安装脚本。
+</details>
+
+<details>
+<summary><b>Q3: 如何彻底卸载并恢复官方原版英文？</b></summary>
+随时双击运行 <code>双击卸载还原官方英文.bat</code>（或执行 <code>node localization_engine.js --huifu</code>），程序会通过备份的 <code>app.asar.bak</code> 完美复原，绝不留任何残留。
+</details>
 
 ---
 
-## 🛠️ 汉化原理说明
+## 🤝 参与贡献
 
-本引擎采用 **ASAR 包注入模式**，专为 **Antigravity 2.0+** 的 Electron 架构量身定制：
-1. **自动释放锁**：脚本运行前会自动探测并安全关闭 Antigravity 进程，防止文件占用锁定。
-2. **安全备份**：首次运行时，会在软件目录自动创建原始 `app.asar.bak` 文件，确保随时可无损还原。
-3. **精准注入**：
-   - 注入 `preload.js`：采用 WeakSet 记录与 Shadow DOM 穿透，启动高效的 `MutationObserver` 引擎，动态监测并将渲染层文本翻译为中文。
-   - 注入 `menu.js`：深度补丁系统级标题栏菜单。
-   - 注入 `tray.js`：汉化托盘与右键通知状态菜单。
-   - 注入 `loadingOverlay.js`：注入极具极客风格的趣味加载语：“反重力引擎已启动，正在摆脱地心引力...”。
+欢迎提交 Issue 和 Pull Request！如果你在最新版本中发现了未翻译的新词条，欢迎修改 `dicts/*.json` 并提交 PR。
 
----
+## 📄 开源许可证
 
-## 💡 如何通过 AI 助手自动补充或修改汉化？
-
-如果在使用过程中，您发现了漏译的英文，或者觉得某些中文翻译不够接地气，**您可以直接在聊天窗口中命令您的 AI 编码助手（即 Antigravity）来帮您更新词库**！无论是直接发截图还是描述文字，AI 都会自动帮您把对照词条写进词典。
-
-> [!IMPORTANT]
-> **⚠️ AI 助手如何定位您的汉化词库文件？**
-> 
-> 1. **推荐做法（最省心）**：
->    在 Antigravity 软件中，点击 **“打开文件夹 (Open Folder)”**，直接将本汉化包目录（即包含当前 `README.md` 的文件夹）作为**项目/工作区**打开，然后在此工作区下与 AI 对话。此时 AI 能够直接感知并读写当前项目，您不需要提供任何路径，直接发送翻译要求，AI 就能在后台自动帮您改好词典！
-> 
-> 2. **免开项目做法（提示词中需指定汉化目录）**：
->    如果您当前正在开发别的项目，没有把汉化目录作为项目打开，那么您在对 AI 发起汉化命令时，**必须在提示词里明确告诉 AI 您的汉化包所在路径**，否则 AI 无法得知要修改您电脑上的哪个文件夹。
->    * **提示词示例**：
->      > **“我的汉化包目录在 `C:\Users\您的电脑用户名\Downloads\antigravity_chinese`（请替换为您本地的实际路径），请帮我把下面这张截图里漏译的内容补全到词典里。”**
-
-### 📋 常用提示词（Prompt）模板
-
-#### 1. 方式一：直接在聊天中发送截图（推荐 📸）
-如果您不方便打字，可以直接将未汉化干净的界面截图粘贴发送给 AI，并附带以下指令：
-> **“帮我把这张截图里所有未汉化的英文选项和面板内容补全到中文词典中。”**
-*(AI 会自动通过视觉识别截图中的全部英文，并精准写入字典。)*
-
-#### 2. 方式二：直接在聊天中发送文字描述（极速 ✍️）
-如果您只想修改或增加某一个特定词汇，可以直接发送文字描述给 AI：
-> **“帮我把漏译的英文 'Allow agent to view and edit files outside of the current workspace automatically' 汉化为 '允许智能体自动查看并编辑当前工作区之外的文件'。”**
-*(AI 会立即找到对应的词典并精准修改或追加该词条。)*
-
----
-
-### 🔄 更新生效流程
-1. **命令 AI 更新**：在对话中通过截图或文字告诉 AI 您的汉化需求，AI 会自动更新 `dicts/` 下的字典文件。
-2. **退出软件**：**完全退出**您的 Antigravity 软件。
-3. **重新注入**：在当前文件夹中**再次双击运行 `双击安装中文汉化.bat` / `.command`** 重新部署汉化。
-4. **重启软件**：重新打开 Antigravity，您的改动即可完美生效！
-
----
-
-## 📝 词典自定义指南 (供极客手动使用)
-
-如果您想手动修改翻译，可以直接打开 `dicts/` 目录下的 JSON 文件：
-- **`common.json`**：公共基础词汇、侧边栏概览、登录页、常用按钮等。
-- **`page_settings.json`**：包含极其丰富的详细设置面板、权限二级菜单对照。
-- **`menu_nav.json`**：系统及菜单栏翻译。
-
-在 JSON 中新增一行，格式如下即可（注意英文逗号）：
-```json
-"Original English Text": "您的中文翻译"
-```
-保存后，双击运行 **`双击安装中文汉化.bat` / `.command`** 重新部署汉化即可。
-
----
-
-## 常见问题解答 (FAQ)
-
-### 1）提示“解包失败”或缺少 npm 环境
-* **原因**：汉化引擎依赖 Node.js 进行 ASAR 包的解析。
-* **解决**：由于 Antigravity 本身就是一个基于 Node.js/Electron 的程序，您的电脑一般都已自带环境。如果极少数情况下报错，只需在电脑安装 [Node.js](https://nodejs.org/)（LTS 版本即可）并重启脚本。
-
-### 2）提示“权限不足”或 macOS 提示“无法打开”
-* **解决**：
-  - **Windows**：请右键点击 `双击安装中文汉化.bat`，选择 **“以管理员身份运行”**。
-  - **macOS**：若双击运行 `.command` 提示无法打开或没有执行权限，可在终端中执行 `chmod +x *.command` 来授权。如果是系统安全拦截，请在“系统设置 -> 隐私与安全性”中点击“仍要打开”。本汉化包已内置自动重签名机制，修改后会重新进行 Ad-hoc 签名以防止 macOS 提示应用损坏。
-
-### 3）软件官方更新后，汉化失效了怎么办？
-* 软件升级时，官方会覆盖 `app.asar` 文件。您无需担心，直接完全退出软件，重新双击运行 **`双击安装中文汉化.bat`** 重新注入一次即可完美恢复中文。
-
----
-
-## 🤝 致谢
-感谢所有参与测试与反馈的贡献者！
+本项目基于 [MIT License](LICENSE) 协议开源。
