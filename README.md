@@ -32,9 +32,18 @@
 
 ---
 
+## ✨ 核心升级亮点
+- ⚡ **官方更新智能守护（零手动二次注入）**：内置 `antigravity_smart_launcher.vbs` 启动守护引擎。官方后台每次自动更新后，启动器自动感知并在 0.5 秒内静默打好中文补丁并拉起软件，**彻底告别每次手动重新双击注入**！
+- 🎯 **全量设置面板 100% 汉化**：全面覆盖 Remote Control 远程控制、Execution 执行策略、MCP 服务器、API 密钥、思考推理过程、沙箱安全、键盘快捷键等全部最新二级子页面标题与内容。
+- 🛡️ **物理禁区隔离**：向上回溯 12 层 DOM 树，严格保护编辑器代码区、终端命令行、用户发送的消息与大模型回复原文不被篡改。
+
+---
+
 ## 📂 项目文件结构
+- **`一键生成自动汉化启动器.bat`**：**（强烈推荐 ⭐）** 一键完成汉化注入并在桌面生成【Antigravity-CN】自动更新守护快捷方式。
 - **`双击安装中文汉化.bat`** / **`.command`**：Windows / macOS 一键汉化执行入口。
 - **`双击卸载还原官方英文.bat`** / **`.command`**：Windows / macOS 一键完美恢复原版入口。
+- **`antigravity_smart_launcher.vbs`**：自动更新检测与静默注入守护启动脚本。
 - **`localization_engine.js`**：核心汉化逻辑，负责 app.asar 的解包、代码注入、重新打包以及 macOS 下的自动深度重签名。
 - **`dicts/`**：汉化字典文件夹，内含按模块分类的 JSON 对照翻译字典。
 
@@ -50,14 +59,16 @@
   3. 将下载好的压缩包**解压到您电脑本地的任意目录**（例如您的 `Downloads` 文件夹）。
 
 * **方法 B：通过 Git 命令行克隆（开发者推荐 💻）**
-  如果您本地安装了 Git，可以直接在终端运行克隆命令：
   ```bash
-  # 如果您在国内，推荐使用下方代理加速克隆地址：
-  git clone https://mirror.ghproxy.com/https://github.com/qqxpee/antigravity2-cn.git
-  
-  # 如果您配置了全局代理，可直接使用官方地址：
-  git clone https://github.com/qqxpee/antigravity2-cn.git
+  git clone https://github.com/TaoCosmo-Dev/antigravity-cn.git
   ```
+
+---
+
+### 2. 一键安装与配置自动更新守护（推荐）
+1. 进入解压出来的 `antigravity-cn` 文件夹；
+2. **Windows 用户**：直接双击运行 **`一键生成自动汉化启动器.bat`**；
+3. 桌面将自动生成 **`Antigravity-CN`** 快捷方式。以后直接从桌面启动即可，官方无论自动更新多少次都会自动保持中文！
 
 ---
 
