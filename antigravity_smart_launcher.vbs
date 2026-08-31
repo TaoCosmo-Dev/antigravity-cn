@@ -6,19 +6,22 @@ engineScript = scriptDir & "\localization_engine.js"
 
 localAppData = shell.ExpandEnvironmentStrings("%LOCALAPPDATA%")
 progFiles = shell.ExpandEnvironmentStrings("%ProgramFiles%")
+progFilesX86 = shell.ExpandEnvironmentStrings("%ProgramFiles(x86)%")
 
 candidates = Array(_
     localAppData & "\Programs\antigravity", _
     localAppData & "\Programs\Antigravity IDE", _
     progFiles & "\Antigravity", _
+    progFilesX86 & "\Antigravity", _
     "C:\Programs\Antigravity", _
     "D:\Programs\Antigravity", _
-    "E:\Programs\Antigravity" _
+    "E:\Programs\Antigravity", _
+    "F:\Programs\Antigravity" _
 )
 
 installDir = ""
 For Each p In candidates
-    If fso.FolderExists(p) Then
+    If p <> "" And fso.FolderExists(p) Then
         If fso.FileExists(p & "\Antigravity.exe") Then
             installDir = p
             Exit For

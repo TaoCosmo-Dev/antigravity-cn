@@ -2,45 +2,63 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const desktopPath = path.join(process.env.USERPROFILE || process.env.HOME || '', 'Desktop', 'Antigravity-CN.lnk');
+// 1. 动态检测用户的真实桌面路径 (支持 OneDrive 桌面重定向)
+function getDesktopPath() {
+    const userProfile = process.env.USERPROFILE || process.env.HOME || '';
+    const candidates = [
+        path.join(userProfile, 'Desktop'),
+        path.join(userProfile, 'OneDrive', 'Desktop'),
+        path.join(process.env.OneDrive || '', 'Desktop')
+    ];
+    for (const p of candidates) {
+        if (p && fs.existsSync(p)) return path.join(p, 'Antigravity-CN.lnk');
+    }
+    return path.join(userProfile, 'Desktop', 'Antigravity-CN.lnk');
+}
+
+const desktopShortcut = getDesktopPath();
 const targetScript = path.join(__dirname, 'antigravity_smart_launcher.vbs');
 
-// 动态检测 Antigravity.exe 实际安装路径
+// 2. 动态检测 Antigravity.exe 实际安装路径
 const localAppData = process.env.LOCALAPPDATA || '';
 const progFiles = process.env.ProgramFiles || 'C:\\Program Files';
+const progFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
+
 const candidates = [
-  path.join(localAppData, 'Programs', 'antigravity', 'Antigravity.exe'),
-  path.join(localAppData, 'Programs', 'Antigravity IDE', 'Antigravity.exe'),
-  path.join(progFiles, 'Antigravity', 'Antigravity.exe'),
-  'C:\\Programs\\Antigravity\\Antigravity.exe',
-  'D:\\Programs\\Antigravity\\Antigravity.exe',
-  'E:\\Programs\\Antigravity\\Antigravity.exe'
+    path.join(localAppData, 'Programs', 'antigravity', 'Antigravity.exe'),
+    path.join(localAppData, 'Programs', 'Antigravity IDE', 'Antigravity.exe'),
+    path.join(progFiles, 'Antigravity', 'Antigravity.exe'),
+    path.join(progFilesX86, 'Antigravity', 'Antigravity.exe'),
+    'C:\\Programs\\Antigravity\\Antigravity.exe',
+    'D:\\Programs\\Antigravity\\Antigravity.exe',
+    'E:\\Programs\\Antigravity\\Antigravity.exe',
+    'F:\\Programs\\Antigravity\\Antigravity.exe'
 ];
 
 let iconExe = '';
 for (const p of candidates) {
-  if (fs.existsSync(p)) {
-    iconExe = p;
-    break;
-  }
+    if (fs.existsSync(p)) {
+        iconExe = p;
+        break;
+    }
 }
 if (!iconExe) iconExe = candidates[0];
 
 const vbs = [
-  'Set ws = WScript.CreateObject("WScript.Shell")',
-  `Set link = ws.CreateShortcut("${desktopPath.replace(/\\/g, '\\\\')}")`,
-  'link.TargetPath = "wscript.exe"',
-  `link.Arguments = """${targetScript.replace(/\\/g, '\\\\')}"""`,
-  `link.IconLocation = "${iconExe.replace(/\\/g, '\\\\')},0"`,
-  'link.Description = "Antigravity 智能编程 (自动更新汉化)"',
-  'link.Save'
+    'Set ws = WScript.CreateObject("WScript.Shell")',
+    `Set link = ws.CreateShortcut("${desktopShortcut.replace(/\\/g, '\\\\')}")`,
+    'link.TargetPath = "wscript.exe"',
+    `link.Arguments = """${targetScript.replace(/\\/g, '\\\\')}"""`,
+    `link.IconLocation = "${iconExe.replace(/\\/g, '\\\\')},0"`,
+    'link.Description = "Antigravity 智能编程 (自动更新汉化)"',
+    'link.Save'
 ].join('\r\n');
 
 const tempFile = path.join(__dirname, '_mklink.vbs');
 fs.writeFileSync(tempFile, vbs, 'ascii');
 try {
-  execSync(`cscript //nologo "${tempFile}"`);
-  console.log('[√] 桌面快捷方式 Antigravity-CN 已成功创建！');
+    execSync(`cscript //nologo "${tempFile}"`);
+    console.log(`[√] 桌面快捷方式已成功创建: ${desktopShortcut}`);
 } finally {
-  if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
+    if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
 }
