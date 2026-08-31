@@ -35,8 +35,11 @@ If installDir <> "" Then
 
     If Not fso.FileExists(asarBak) Then
         If fso.FileExists(engineScript) Then
-            cmd = "node """ & engineScript & """ --brand-title english --no-kill"
+            Set env = shell.Environment("PROCESS")
+            env("ELECTRON_RUN_AS_NODE") = "1"
+            cmd = """" & appExe & """ """ & engineScript & """ --brand-title english --no-kill"
             shell.Run cmd, 0, True
+            env.Remove("ELECTRON_RUN_AS_NODE")
         End If
     End If
 
@@ -44,7 +47,13 @@ If installDir <> "" Then
         shell.Run """" & appExe & """", 1, False
     End If
 Else
-    If fso.FileExists(engineScript) Then
+    whereNode = False
+    On Error Resume Next
+    testRun = shell.Run("where node", 0, True)
+    If Err.Number = 0 And testRun = 0 Then whereNode = True
+    On Error GoTo 0
+
+    If whereNode And fso.FileExists(engineScript) Then
         cmd = "node """ & engineScript & """ --brand-title english --no-kill"
         shell.Run cmd, 0, True
     End If

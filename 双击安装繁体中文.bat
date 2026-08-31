@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 title Antigravity 繁體中文安裝工具
 
 echo ========================================================
@@ -6,10 +7,31 @@ echo   Antigravity 2.0 繁體中文一鍵安裝
 echo ========================================================
 echo.
 
+set "NODE_CMD="
 where node >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [錯誤] 未檢測到 Node.js 運行環境！
-    echo 請先前往 https://nodejs.org 下載安裝 Node.js (LTS 版)。
+if %errorlevel% equ 0 (
+    set "NODE_CMD=node"
+) else (
+    set "CAND[0]=%LOCALAPPDATA%\Programs\antigravity\Antigravity.exe"
+    set "CAND[1]=%LOCALAPPDATA%\Programs\Antigravity IDE\Antigravity.exe"
+    set "CAND[2]=%ProgramFiles%\Antigravity\Antigravity.exe"
+    set "CAND[3]=%ProgramFiles(x86)%\Antigravity\Antigravity.exe"
+    set "CAND[4]=C:\Programs\Antigravity\Antigravity.exe"
+    set "CAND[5]=D:\Programs\Antigravity\Antigravity.exe"
+    set "CAND[6]=E:\Programs\Antigravity\Antigravity.exe"
+    
+    for /L %%i in (0,1,6) do (
+        if not defined NODE_CMD (
+            if exist "!CAND[%%i]!" (
+                set "NODE_CMD="!CAND[%%i]!""
+                set "ELECTRON_RUN_AS_NODE=1"
+            )
+        )
+    )
+)
+
+if not defined NODE_CMD (
+    echo [錯誤] 未檢測到 Antigravity 安裝路徑且系統未安裝 Node.js！
     pause
     exit /b 1
 )
@@ -26,7 +48,7 @@ if "%CHOICE_VAL%"=="3" set "BRAND_ARG=--brand-title translated"
 
 echo.
 echo 正在執行繁體中文注入...
-node "%~dp0localization_engine.js" %BRAND_ARG% --tw
+%NODE_CMD% "%~dp0localization_engine.js" %BRAND_ARG% --tw
 
 if %errorlevel% neq 0 (
     echo.
