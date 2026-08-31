@@ -330,7 +330,7 @@
     "App Settings": "应用设置",
     "Manage application settings.": "管理应用设置。",
     "Prevent Sleep": "防止休眠",
-    "Prevent the computer from sleeping while the app is running.": "防止计算机在应用程序运行时进入休眠状态。",
+    "Prevent the computer from sleeping while the app is running.": "在应用运行期间阻止计算机进入休眠状态。",
     "Keep In Menu Bar": "常驻系统菜单栏/托盘",
     "The app will be accessible from the menu bar and will keep running in the background when all windows are closed.": "当所有窗口都关闭时，依然可以通过菜单栏/系统托盘访问应用程序，且保持后台运行。",
     "Browser Settings": "浏览器设置",
@@ -565,5 +565,11 @@
     "Manage custom agents and rules.": "管理自定义智能体与行为规则。",
     "MCP & Integrations": "MCP 与扩展集成",
     "Manage MCP servers and plugins.": "管理 MCP 服务器与扩展插件。",
-    "Customization": "个性化"
+    "Customization": "个性化",
+    "Configure the maximum width of the conversation panel.": "配置会话面板的最大宽度。",
+    "Configure the maximum width of the conversation panel": "配置会话面板的最大宽度",
+    "Keep the app accessible from the menu bar and running in the background when all windows are closed.": "当所有窗口关闭时，保持应用在后台运行并可在系统菜单栏/托盘中访问。",
+    "Keep the app accessible from the menu bar and running in the background when all windows are closed": "当所有窗口关闭时，保持应用在后台运行并可在系统菜单栏/托盘中访问",
+    "Conversation width": "会话面板宽度",
+    "Prevent the computer from sleeping while the app is running": "在应用运行期间阻止计算机进入休眠状态"
 }

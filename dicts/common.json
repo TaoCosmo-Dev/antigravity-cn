@@ -346,5 +346,17 @@
     "CUSTOMIZATIONS": "个性化",
     "Settings - Models": "设置 - 模型",
     "Settings - Customizations": "设置 - 个性化",
-    "Loading models...": "正在加载模型..."
+    "Loading models...": "正在加载模型...",
+    "Configure the maximum width of the conversation panel.": "配置会话面板的最大宽度。",
+    "Configure the maximum width of the conversation panel": "配置会话面板的最大宽度",
+    "Keep the app accessible from the menu bar and running in the background when all windows are closed.": "当所有窗口关闭时，保持应用在后台运行并可在系统菜单栏/托盘中访问。",
+    "Keep the app accessible from the menu bar and running in the background when all windows are closed": "当所有窗口关闭时，保持应用在后台运行并可在系统菜单栏/托盘中访问",
+    "Conversation Width": "会话面板宽度",
+    "Conversation width": "会话面板宽度",
+    "Narrow": "窄",
+    "Wide": "宽",
+    "Prevent the computer from sleeping while the app is running.": "在应用运行期间阻止计算机进入休眠状态。",
+    "Prevent the computer from sleeping while the app is running": "在应用运行期间阻止计算机进入休眠状态",
+    "Prevent the computer from sleeping while agents are active.": "在智能体活跃运行期间阻止计算机进入休眠状态。",
+    "Prevent the computer from sleeping while agents are active": "在智能体活跃运行期间阻止计算机进入休眠状态"
 }
