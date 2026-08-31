@@ -465,5 +465,16 @@
     "Keep the app accessible from the menu bar and running in the background when all windows are closed": "當所有視窗關閉時，保持應用程式在後台執行並可在系統選單列/系統匣中存取",
     "Pair Device": "配對新裝置",
     "Connected Devices": "已連線裝置",
-    "No devices connected": "暫無已連線裝置"
+    "No devices connected": "暫無已連線裝置",
+    "Application": "應用程式",
+    "Manage Antigravity app settings.": "管理 Antigravity 應用程式設定。",
+    "Manage Antigravity app settings": "管理 Antigravity 應用程式設定",
+    "Models & Usage": "驅動模型與配額",
+    "Models & usage": "驅動模型與配額",
+    "Manage your model quota and credits.": "管理您的模型配額與積分額度。",
+    "Manage your model quota and credits": "管理您的模型配額與積分額度",
+    "Configure agent execution, queued message delivery, and permissions.": "設定智慧體執行策略、排隊訊息傳送時機與操作權限。",
+    "Configure agent execution, queued message delivery, and permissions": "設定智慧體執行策略、排隊訊息傳送時機與操作權限",
+    "Configure agent execution, queued message delivery, 與权限。": "設定智慧體執行策略、排隊訊息傳送時機與操作權限。",
+    "Configure agent execution, queued message delivery, 與权限": "設定智慧體執行策略、排隊訊息傳送时機與操作權限"
 }

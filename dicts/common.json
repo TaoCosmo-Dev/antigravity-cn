@@ -324,7 +324,17 @@
     "You have used some of your weekly limit.": "您已使用了本周的部分配额。",
     "You have used some of your weekly limit": "您已使用了本周的部分配额",
     "You have used some of your 5-hour limit.": "您已使用了5小时内的部分配额。",
-    "You have used some of your 5-hour limit": "您已使用了5小时内的部分配额",
     "You have used some of your five hour limit.": "您已使用了5小时内的部分配额。",
-    "You have used some of your five hour limit": "您已使用了5小时内的部分配额"
+    "You have used some of your five hour limit": "您已使用了5小时内的部分配额",
+    "Application": "应用程序",
+    "Manage Antigravity app settings.": "管理 Antigravity 应用程序设置。",
+    "Manage Antigravity app settings": "管理 Antigravity 应用程序设置",
+    "Models & Usage": "驱动模型与配额",
+    "Models & usage": "驱动模型与配额",
+    "Manage your model quota and credits.": "管理您的模型配额与积分额度。",
+    "Manage your model quota and credits": "管理您的模型配额与积分额度",
+    "Configure agent execution, queued message delivery, and permissions.": "配置智能体执行策略、排队消息发送时机与操作权限。",
+    "Configure agent execution, queued message delivery, and permissions": "配置智能体执行策略、排队消息发送时机与操作权限",
+    "Configure agent execution, queued message delivery, 与权限。": "配置智能体执行策略、排队消息发送时机与操作权限。",
+    "Configure agent execution, queued message delivery, 与权限": "配置智能体执行策略、排队消息发送时机与操作权限"
 }

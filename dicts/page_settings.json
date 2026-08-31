@@ -560,5 +560,22 @@
     "Review Before Action": "执行前人工审查",
     "Auto Approve": "自动批准",
     "Always Ask": "每次询问",
-    "Never Ask": "从不询问"
+    "Never Ask": "从不询问",
+    "Application": "应用程序",
+    "Manage Antigravity app settings.": "管理 Antigravity 应用程序设置。",
+    "Manage Antigravity app settings": "管理 Antigravity 应用程序设置",
+    "Models & Usage": "驱动模型与配额",
+    "Models & usage": "驱动模型与配额",
+    "Manage your model quota and credits.": "管理您的模型配额与积分额度。",
+    "Manage your model quota and credits": "管理您的模型配额与积分额度",
+    "Configure agent execution, queued message delivery, and permissions.": "配置智能体执行策略、排队消息发送时机与操作权限。",
+    "Configure agent execution, queued message delivery, and permissions": "配置智能体执行策略、排队消息发送时机与操作权限",
+    "Configure agent execution, queued message delivery, 与权限。": "配置智能体执行策略、排队消息发送时机与操作权限。",
+    "Configure agent execution, queued message delivery, 与权限": "配置智能体执行策略、排队消息发送时机与操作权限",
+    "Customize Antigravity look and feel.": "自定义 Antigravity 外观与主题风格。",
+    "Customize Antigravity look and feel": "自定义 Antigravity 外观与主题风格",
+    "Agents & Rules": "智能体与规则",
+    "Manage custom agents and rules.": "管理自定义智能体与行为规则。",
+    "MCP & Integrations": "MCP 与扩展集成",
+    "Manage MCP servers and plugins.": "管理 MCP 服务器与扩展插件。"
 }
