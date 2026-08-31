@@ -690,7 +690,37 @@ function detectInstallationDir(manualDir) {
             }
         }
 
-        // 2. 注册表检测
+        // 2. 检查当前是否正在运行 Antigravity，直接从运行进程提取真实安装路径
+        try {
+            const psOut = child_process.execSync('powershell -NoProfile -Command "(Get-Process -Name Antigravity -ErrorAction SilentlyContinue).Path"', { encoding: 'utf-8', stdio: 'pipe' }).trim();
+            if (psOut) {
+                for (const line of psOut.split(/\r?\n/)) {
+                    const p = line.trim();
+                    if (p && fs.existsSync(p)) {
+                        addCandidate(fs.statSync(p).isDirectory() ? p : path.dirname(p));
+                    }
+                }
+            }
+        } catch (e) {}
+
+        // 3. 注册表与系统 App Paths 检测
+        const appPaths = [
+            'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Antigravity.exe',
+            'HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Antigravity.exe'
+        ];
+        for (const k of appPaths) {
+            try {
+                const q = child_process.execSync(`reg query "${k}" /ve`, { encoding: 'utf-8', stdio: 'pipe' });
+                const m = q.match(/REG_\w+\s+(.+)$/m);
+                if (m && m[1]) {
+                    let clean = m[1].trim().replace(/^"|"$/g, '');
+                    if (fs.existsSync(clean)) {
+                        addCandidate(fs.statSync(clean).isDirectory() ? clean : path.dirname(clean));
+                    }
+                }
+            } catch (e2) {}
+        }
+
         const registryRoots = [
             'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
             'HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
@@ -711,7 +741,7 @@ function detectInstallationDir(manualDir) {
             } catch (e) {}
         }
 
-        // 3. 常见盘符与目录全量深度轮询
+        // 4. 常见盘符与目录全量深度轮询 (C~Z 盘)
         const driveLetters = ['C', 'D', 'E', 'F', 'G', 'H', 'Z'];
         for (const drive of driveLetters) {
             addCandidate(`${drive}:\\Programs\\Antigravity`);
@@ -721,6 +751,10 @@ function detectInstallationDir(manualDir) {
             addCandidate(`${drive}:\\antigravity`);
             addCandidate(`${drive}:\\Software\\Antigravity`);
             addCandidate(`${drive}:\\Software\\antigravity`);
+            addCandidate(`${drive}:\\Apps\\Antigravity`);
+            addCandidate(`${drive}:\\Apps\\antigravity`);
+            addCandidate(`${drive}:\\Tools\\Antigravity`);
+            addCandidate(`${drive}:\\Tools\\antigravity`);
             addCandidate(`${drive}:\\Program Files\\Antigravity`);
             addCandidate(`${drive}:\\Program Files\\antigravity`);
             addCandidate(`${drive}:\\Program Files (x86)\\Antigravity`);
@@ -751,14 +785,30 @@ function detectInstallationDir(manualDir) {
         }
     }
 
-    // 4. 自动探测失败时，启动交互式输入向导，绝不闪退报错
+    // 5. 自动探测未命中时，自动唤起 Windows 原生文件夹选择弹窗，绝不报错闪退
     console.log("\n========================================================");
     console.log("【智能路径定位向导】");
-    console.log("未能自动探测到您的 Antigravity 安装文件夹。");
-    console.log("提示：您可以【右键点击桌面 Antigravity 图标 -> 属性 -> 打开文件所在位置】");
-    console.log("然后将文件所在文件夹路径复制粘贴到下方，按回车即可继续：");
+    console.log("正在为您打开【Windows 文件夹选择窗口】，请直接在弹窗中选择您的 Antigravity 安装文件夹...");
     console.log("========================================================\n");
-    process.stdout.write("请输入 Antigravity 安装路径: ");
+
+    try {
+        const tempVbs = path.join(__dirname, '_browse_folder.vbs');
+        const vbs = `Set shell = CreateObject("Shell.Application")\nSet f = shell.BrowseForFolder(0, "请选择 Antigravity 安装目录 (包含 resources 或 Antigravity.exe 的文件夹):", 0, 0)\nIf Not f Is Nothing Then WScript.Echo f.Self.Path`;
+        fs.writeFileSync(tempVbs, vbs, 'ascii');
+        const chosen = child_process.execSync(`cscript //nologo "${tempVbs}"`, { encoding: 'utf-8' }).trim();
+        if (fs.existsSync(tempVbs)) fs.unlinkSync(tempVbs);
+        if (chosen && fs.existsSync(chosen)) {
+            let resolved = path.resolve(chosen);
+            if (fs.statSync(resolved).isFile()) resolved = path.dirname(resolved);
+            if (hasAntigravityResources(resolved)) {
+                console.log(`[选择] 成功定位所选目录: ${resolved}`);
+                return resolved;
+            }
+        }
+    } catch (e) {}
+
+    // 终端控制台手动粘贴回退
+    process.stdout.write("请输入 Antigravity 安装路径并按回车: ");
     try {
         const buf = Buffer.alloc(1024);
         const bytesRead = fs.readSync(0, buf, 0, 1024, null);
