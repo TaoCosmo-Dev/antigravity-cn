@@ -652,6 +652,45 @@ function detectInstallationDir(manualDir) {
         addCandidate(process.env.ANTIGRAVITY_INSTALL_DIR);
         addCandidate(process.env.ANTIGRAVITY_HOME);
 
+        // 1. 扫描桌面和开始菜单的快捷方式 (.lnk) 提取真实安装路径
+        const userProf = process.env.USERPROFILE || '';
+        const oneDrive = process.env.OneDrive || '';
+        const appData = process.env.APPDATA || '';
+        const allUsersProf = process.env.ALLUSERSPROFILE || 'C:\\ProgramData';
+        
+        const lnkCandidates = [
+            path.join(userProf, 'Desktop', 'Antigravity.lnk'),
+            path.join(userProf, 'Desktop', 'Antigravity-CN.lnk'),
+            path.join(oneDrive, 'Desktop', 'Antigravity.lnk'),
+            path.join(oneDrive, 'Desktop', 'Antigravity-CN.lnk'),
+            path.join(allUsersProf, 'Desktop', 'Antigravity.lnk'),
+            path.join(appData, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Antigravity.lnk'),
+            path.join(appData, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Antigravity', 'Antigravity.lnk'),
+            path.join(allUsersProf, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Antigravity.lnk'),
+            path.join(allUsersProf, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Antigravity', 'Antigravity.lnk')
+        ];
+
+        for (const lnk of lnkCandidates) {
+            if (fs.existsSync(lnk)) {
+                try {
+                    const tempVbs = path.join(__dirname, '_get_lnk_dir.vbs');
+                    const vbsCode = `Set ws = WScript.CreateObject("WScript.Shell")\nSet sc = ws.CreateShortcut("${lnk.replace(/\\/g, '\\\\')}")\nWScript.Echo sc.TargetPath & "|" & sc.IconLocation`;
+                    fs.writeFileSync(tempVbs, vbsCode, 'ascii');
+                    const out = child_process.execSync(`cscript //nologo "${tempVbs}"`, { encoding: 'utf-8', stdio: 'pipe' }).trim();
+                    if (fs.existsSync(tempVbs)) fs.unlinkSync(tempVbs);
+                    
+                    for (const raw of out.split('|')) {
+                        let clean = raw.trim().replace(/^"|"$/g, '').split(',')[0];
+                        if (clean && fs.existsSync(clean)) {
+                            if (fs.statSync(clean).isFile()) clean = path.dirname(clean);
+                            addCandidate(clean);
+                        }
+                    }
+                } catch (e) {}
+            }
+        }
+
+        // 2. 注册表检测
         const registryRoots = [
             'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
             'HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
@@ -669,21 +708,36 @@ function detectInstallationDir(manualDir) {
                     }
                     addCandidate(value);
                 }
-            } catch (e) {
-                // Registry probing is best-effort; fall back to common locations below.
-            }
+            } catch (e) {}
         }
 
-        const driveLetters = ['C', 'D', 'E', 'F'];
+        // 3. 常见盘符与目录全量深度轮询
+        const driveLetters = ['C', 'D', 'E', 'F', 'G', 'H', 'Z'];
         for (const drive of driveLetters) {
             addCandidate(`${drive}:\\Programs\\Antigravity`);
+            addCandidate(`${drive}:\\Programs\\antigravity`);
+            addCandidate(`${drive}:\\Programs\\Antigravity IDE`);
             addCandidate(`${drive}:\\Antigravity`);
+            addCandidate(`${drive}:\\antigravity`);
+            addCandidate(`${drive}:\\Software\\Antigravity`);
+            addCandidate(`${drive}:\\Software\\antigravity`);
+            addCandidate(`${drive}:\\Program Files\\Antigravity`);
+            addCandidate(`${drive}:\\Program Files\\antigravity`);
+            addCandidate(`${drive}:\\Program Files (x86)\\Antigravity`);
+            addCandidate(`${drive}:\\Program Files (x86)\\antigravity`);
         }
-        addCandidate("C:\\Program Files\\Antigravity");
 
         const localAppdata = process.env.LOCALAPPDATA;
         if (localAppdata) {
             addCandidate(path.join(localAppdata, 'Programs', 'antigravity'));
+            addCandidate(path.join(localAppdata, 'Programs', 'Antigravity'));
+            addCandidate(path.join(localAppdata, 'Programs', 'Antigravity IDE'));
+            addCandidate(path.join(localAppdata, 'antigravity'));
+        }
+        const roamingAppdata = process.env.APPDATA;
+        if (roamingAppdata) {
+            addCandidate(path.join(roamingAppdata, 'antigravity'));
+            addCandidate(path.join(roamingAppdata, 'Antigravity'));
         }
     } else if (process.platform === 'darwin') {
         addCandidate("/Applications/Antigravity.app");
@@ -696,6 +750,27 @@ function detectInstallationDir(manualDir) {
             return path.resolve(p);
         }
     }
+
+    // 4. 自动探测失败时，启动交互式输入向导，绝不闪退报错
+    console.log("\n========================================================");
+    console.log("【智能路径定位向导】");
+    console.log("未能自动探测到您的 Antigravity 安装文件夹。");
+    console.log("提示：您可以【右键点击桌面 Antigravity 图标 -> 属性 -> 打开文件所在位置】");
+    console.log("然后将文件所在文件夹路径复制粘贴到下方，按回车即可继续：");
+    console.log("========================================================\n");
+    process.stdout.write("请输入 Antigravity 安装路径: ");
+    try {
+        const buf = Buffer.alloc(1024);
+        const bytesRead = fs.readSync(0, buf, 0, 1024, null);
+        const input = buf.toString('utf-8', 0, bytesRead).trim().replace(/^"|"$/g, '');
+        if (input && fs.existsSync(input)) {
+            let resolved = path.resolve(input);
+            if (fs.statSync(resolved).isFile()) resolved = path.dirname(resolved);
+            if (hasAntigravityResources(resolved)) {
+                return resolved;
+            }
+        }
+    } catch (e) {}
 
     console.error("[错误] 未找到默认安装目录，请使用 --install-dir 手动指定您的安装路径！");
     process.exit(1);
