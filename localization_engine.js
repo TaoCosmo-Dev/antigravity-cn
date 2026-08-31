@@ -741,7 +741,46 @@ function resignAppOnMac(anyPath) {
 // ==========================================
 // Antigravity 2.0 汉化引擎 (ASAR打包注入模式)
 // ==========================================
-function install20(resourcesDir) {
+let asarLib = null;
+try {
+    asarLib = require('@electron/asar');
+} catch (e) {
+    try {
+        asarLib = require(path.join(__dirname, 'node_modules', '@electron/asar'));
+    } catch (e2) {
+        asarLib = null;
+    }
+}
+
+function extractAsarSync(src, dest) {
+    if (asarLib && typeof asarLib.extractAll === 'function') {
+        try {
+            asarLib.extractAll(src, dest);
+            if (fs.existsSync(dest) && fs.existsSync(path.join(dest, 'dist', 'preload.js'))) {
+                return { success: true };
+            }
+        } catch (e) {
+            // fall through to npx
+        }
+    }
+    return runCommandSync(`npx -y @electron/asar extract "${src}" "${dest}"`);
+}
+
+async function packAsarAsync(src, dest) {
+    if (asarLib && typeof asarLib.createPackage === 'function') {
+        try {
+            await asarLib.createPackage(src, dest);
+            if (fs.existsSync(dest)) {
+                return { success: true };
+            }
+        } catch (e) {
+            // fall through to npx
+        }
+    }
+    return runCommandSync(`npx -y @electron/asar pack "${src}" "${dest}"`);
+}
+
+async function install20(resourcesDir) {
     const asarPath = path.join(resourcesDir, "app.asar");
     const bakPath = path.join(resourcesDir, "app.asar.bak");
 
@@ -759,18 +798,18 @@ function install20(resourcesDir) {
     // 2. 优先解包当前的 app.asar，绝不盲目用旧 bak 覆盖破坏新版本
     let extractSource = fs.existsSync(asarPath) ? asarPath : bakPath;
 
-    console.log(`[解包] 正在使用 npx 提取 app.asar...`);
-    let extractRes = runCommandSync(`npx -y @electron/asar extract "${extractSource}" "${tempDir}"`);
+    console.log(`[解包] 正在提取 app.asar...`);
+    let extractRes = extractAsarSync(extractSource, tempDir);
     
     // 如果主包解包失败但存在备份，尝试从备份解包自愈
     if ((!extractRes.success || !fs.existsSync(tempDir)) && fs.existsSync(bakPath) && extractSource !== bakPath) {
         console.warn(`[自愈] 当前 app.asar 解包异常，正在尝试从原始备份 app.asar.bak 提取...`);
-        extractRes = runCommandSync(`npx -y @electron/asar extract "${bakPath}" "${tempDir}"`);
+        extractRes = extractAsarSync(bakPath, tempDir);
     }
 
     if (!extractRes.success || !fs.existsSync(tempDir)) {
         console.error(`[错误] 解包失败，可能是由于系统未安装 Node.js/npm 或者网络限制。`);
-        console.error(`详情: ${extractRes.stderr}\n${extractRes.stdout}`);
+        if (extractRes.stderr) console.error(`详情: ${extractRes.stderr}\n${extractRes.stdout}`);
         return false;
     }
 
@@ -992,14 +1031,14 @@ function install20(resourcesDir) {
 
     // 4. 重新打包
     console.log(`[打包] 正在将修改后的内容打包回 app.asar...`);
-    const packRes = runCommandSync(`npx -y @electron/asar pack "${tempDir}" "${asarPath}"`);
+    const packRes = await packAsarAsync(tempDir, asarPath);
     
     // 5. 清理临时文件夹
     fs.rmSync(tempDir, { recursive: true, force: true });
 
     if (!packRes.success) {
         console.error(`[错误] 打包失败。`);
-        console.error(`详情: ${packRes.stderr}\n${packRes.stdout}`);
+        if (packRes.stderr) console.error(`详情: ${packRes.stderr}\n${packRes.stdout}`);
         return false;
     }
 
@@ -1140,7 +1179,7 @@ function restore10(installDir) {
 // ==========================================
 // 入口
 // ==========================================
-function main() {
+async function main() {
     let huifu = false;
     let manualDir = "";
     let noKill = false;
@@ -1206,7 +1245,7 @@ function main() {
     } else {
         console.log("====== 正在安装 Antigravity 中文汉化 ======");
         if (isV2) {
-            success = install20(resourcesDir);
+            success = await install20(resourcesDir);
         } else {
             success = install10(installDir);
         }
