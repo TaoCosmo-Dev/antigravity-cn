@@ -371,7 +371,7 @@ function generateJs() {
                     newVal = valNorm.replace(/.*?(\d+)\s*hours?.*/i, (m, h) => USE_TW ? ("您已使用了部分 5 小時限制，將在 " + h + " 小時後完全更新。") : ("您已使用了部分 5 小时限制，将在 " + h + " 小时后完全刷新。"));
                 } else if (/(?:used some of your 5-hour limit|使用了.*5\s*小时.*配额).*?refresh.*?in\s*(\d+)\s*minutes?/i.test(valNorm)) {
                     newVal = valNorm.replace(/.*?(\d+)\s*minutes?.*/i, (m, min) => USE_TW ? ("您已使用了部分 5 小時限制，將在 " + min + " 分鐘後完全更新。") : ("您已使用了部分 5 小时限制，将在 " + min + " 分钟后完全刷新。"));
-                } else if (/map.has(valNorm)) {
+                } else if (map.has(valNorm)) {
                     newVal = map.get(valNorm);
                 } else if (lowerMap.has(valLower)) {
                     newVal = lowerMap.get(valLower);
